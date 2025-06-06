@@ -299,6 +299,18 @@ async function injectVideo() {
   }
 }
 
+// Добавляем стили для изменения цвета названия канала при наведении
+if (!document.getElementById('my-channel-link-style')) {
+  const style = document.createElement('style');
+  style.id = 'my-channel-link-style';
+  style.textContent = `
+    a.yt-simple-endpoint.style-scope.ytd-channel-name:hover span.style-scope.ytd-channel-name {
+      color: #f1f1f1 !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function waitForGridAndInject() {
   const grid = document.querySelector("ytd-rich-grid-renderer #contents");
   if (grid) {
