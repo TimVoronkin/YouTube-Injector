@@ -67,7 +67,7 @@ function parseVideoId(str) {
 // В этом файле может быть ID или ссылка на видео, по одному на строку
 async function loadVideoIds() {
   if (window._yt_video_ids_cache) return window._yt_video_ids_cache;
-  const resp = await fetch(chrome.runtime.getURL("video_IDs.txt"));
+  const resp = await fetch(chrome.runtime.getURL("videos-to-insert.txt"));
   const text = await resp.text();
   const ids = text
     .split("\n")
