@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Injector",
+  "version": "0.1",
+  "description": "Injects a video into YouTube pages. by Tim Voronkin",
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": ["activeTab"]
+}
