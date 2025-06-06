@@ -1,4 +1,4 @@
-let videoId = "qKmd4Gc-P4w"; // Укажите videoId или оставьте пустым
+let videoIds = ["qKmd4Gc-P4w", "hjNGszC1oDs"]; // Массив videoId
 
 // Дефолтные данные (если videoId пустой)
 const defaultData = {
@@ -102,22 +102,31 @@ async function getVideoData(videoId) {
 }
 
 async function injectVideo() {
-  let videoData = defaultData;
-  if (videoId) {
-    const fetched = await getVideoData(videoId);
-    if (fetched) videoData = { ...defaultData, ...fetched };
-  }
   // Для главной страницы YouTube
   const grid = document.querySelector("ytd-rich-grid-renderer #contents");
-  if (grid && !document.getElementById("my-custom-video")) {
-    const videoElement = document.createElement("ytd-rich-item-renderer");
-    videoElement.id = "my-custom-video";
-    videoElement.className = "style-scope ytd-rich-grid-renderer";
-    videoElement.setAttribute("items-per-row", "3");
-    videoElement.setAttribute("lockup", "true");
-    videoElement.setAttribute("rendered-from-rich-grid", "");
+  if (grid) {
+    // Удаляем ранее вставленные элементы
+    videoIds.forEach((id, idx) => {
+      const el = document.getElementById("my-custom-video-" + idx);
+      if (el) el.remove();
+    });
 
-    videoElement.innerHTML = `
+    for (let idx = 0; idx < videoIds.length; idx++) {
+      let videoData = defaultData;
+      const id = videoIds[idx];
+      if (id) {
+        const fetched = await getVideoData(id);
+        if (fetched) videoData = { ...defaultData, ...fetched };
+      }
+      if (!document.getElementById("my-custom-video-" + idx)) {
+        const videoElement = document.createElement("ytd-rich-item-renderer");
+        videoElement.id = "my-custom-video-" + idx;
+        videoElement.className = "style-scope ytd-rich-grid-renderer";
+        videoElement.setAttribute("items-per-row", "3");
+        videoElement.setAttribute("lockup", "true");
+        videoElement.setAttribute("rendered-from-rich-grid", "");
+
+        videoElement.innerHTML = `
   <div id="content" class="style-scope ytd-rich-item-renderer">
     <ytd-rich-grid-media class="style-scope ytd-rich-item-renderer" lockup="true">
       <div id="dismissible" class="style-scope ytd-rich-grid-media">
@@ -234,9 +243,24 @@ async function injectVideo() {
   <div class="stroke style-scope yt-interaction"></div>
   <div class="fill style-scope yt-interaction"></div>
 </yt-interaction>
-    `;
-    grid.insertBefore(videoElement, grid.firstChild);
+    `.replaceAll('my-custom-video', 'my-custom-video-' + idx); // (optional: if you use id inside innerHTML)
+
+        // Вставляем в начало списка
+        grid.insertBefore(videoElement, grid.children[idx]);
+      }
+    }
   }
 }
 
-setInterval(injectVideo, 2000);
+function waitForGridAndInject() {
+  const grid = document.querySelector("ytd-rich-grid-renderer #contents");
+  if (grid) {
+    injectVideo();
+  } else {
+    setTimeout(waitForGridAndInject, 300); // Проверяем каждые 300мс до появления grid
+  }
+}
+
+waitForGridAndInject();
+
+// window.addEventListener('DOMContentLoaded', injectVideo);

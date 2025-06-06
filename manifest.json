@@ -5,7 +5,7 @@
   "description": "Injects a video into YouTube pages. by Tim Voronkin",
   "content_scripts": [
     {
-      "matches": ["*://www.youtube.com/*"],
+      "matches": ["*://www.youtube.com/"],
       "js": ["content.js"]
     }
   ],
