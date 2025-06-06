@@ -1,5 +1,4 @@
-// --- Переменные для видео ---
-let videoId = "lBymY13F_54"; // Укажите videoId или оставьте пустым
+let videoId = "qKmd4Gc-P4w"; // Укажите videoId или оставьте пустым
 
 // Дефолтные данные (если videoId пустой)
 const defaultData = {
@@ -17,21 +16,20 @@ const defaultData = {
   verified: true,
 };
 
-// Динамически загружаем apiKey.js
+// Динамически загружаем apiKey.txt
 function loadApiKey() {
-  // Загружаем apiKey.js как текст и парсим ключ
+  // Загружаем apiKey.txt как текст, ключ — это весь файл
   return new Promise((resolve, reject) => {
     if (window._yt_api_key_cache) return resolve(window._yt_api_key_cache);
-    fetch(chrome.runtime.getURL('apiKey.js'))
+    fetch(chrome.runtime.getURL('apiKey.txt'))
       .then(resp => resp.text())
       .then(text => {
-        // Ожидаем строку вида: window.YT_API_KEY = "ключ";
-        const match = text.match(/window\.YT_API_KEY\s*=\s*["']([^"']+)["']/);
-        if (match) {
-          window._yt_api_key_cache = match[1];
-          resolve(match[1]);
+        const key = text.trim();
+        if (key) {
+          window._yt_api_key_cache = key;
+          resolve(key);
         } else {
-          reject('API key not found in apiKey.js');
+          reject('API key not found in apiKey.txt');
         }
       })
       .catch(reject);
