@@ -12,7 +12,7 @@
   "permissions": ["activeTab"],
   "web_accessible_resources": [
     {
-      "resources": ["apiKey.txt"],
+      "resources": ["apiKey.txt", "videoIds.txt"],
       "matches": ["<all_urls>"]
     }
   ]

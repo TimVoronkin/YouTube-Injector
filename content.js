@@ -1,4 +1,6 @@
-let videoIds = ["qKmd4Gc-P4w", "hjNGszC1oDs"]; // Массив videoId
+// Настройки диапазона вставки видео
+const minPos = 1;
+const maxPos = 15;
 
 // Дефолтные данные (если videoId пустой)
 const defaultData = {
@@ -34,6 +36,16 @@ function loadApiKey() {
       })
       .catch(reject);
   });
+}
+
+// Динамически загружаем video_IDs.txt
+async function loadVideoIds() {
+  if (window._yt_video_ids_cache) return window._yt_video_ids_cache;
+  const resp = await fetch(chrome.runtime.getURL('video_IDs.txt'));
+  const text = await resp.text();
+  const ids = text.split('\n').map(line => line.trim()).filter(Boolean);
+  window._yt_video_ids_cache = ids;
+  return ids;
 }
 
 async function getVideoData(videoId) {
@@ -105,6 +117,9 @@ async function injectVideo() {
   // Для главной страницы YouTube
   const grid = document.querySelector("ytd-rich-grid-renderer #contents");
   if (grid) {
+    // Получаем videoIds из файла
+    const videoIds = await loadVideoIds();
+
     // Удаляем ранее вставленные элементы
     videoIds.forEach((id, idx) => {
       const el = document.getElementById("my-custom-video-" + idx);
@@ -243,10 +258,16 @@ async function injectVideo() {
   <div class="stroke style-scope yt-interaction"></div>
   <div class="fill style-scope yt-interaction"></div>
 </yt-interaction>
-    `.replaceAll('my-custom-video', 'my-custom-video-' + idx); // (optional: if you use id inside innerHTML)
+    `.replaceAll('my-custom-video', 'my-custom-video-' + idx);
 
-        // Вставляем в начало списка
-        grid.insertBefore(videoElement, grid.children[idx]);
+        // Вставляем на случайную позицию от minPos до maxPos (или в конец, если элементов меньше)
+        const insertMax = Math.min(maxPos, grid.children.length);
+        const insertPos = Math.floor(Math.random() * insertMax) + minPos;
+        if (insertPos >= grid.children.length) {
+          grid.appendChild(videoElement);
+        } else {
+          grid.insertBefore(videoElement, grid.children[insertPos]);
+        }
       }
     }
   }
@@ -262,5 +283,3 @@ function waitForGridAndInject() {
 }
 
 waitForGridAndInject();
-
-// window.addEventListener('DOMContentLoaded', injectVideo);
