@@ -259,7 +259,6 @@ async function injectVideo() {
   <div class="fill style-scope yt-interaction"></div>
 </yt-interaction>
     `.replaceAll('my-custom-video', 'my-custom-video-' + idx);
-
         // Вставляем на случайную позицию от minPos до maxPos (или в конец, если элементов меньше)
         const insertMax = Math.min(maxPos, grid.children.length);
         const insertPos = Math.floor(Math.random() * insertMax) + minPos;

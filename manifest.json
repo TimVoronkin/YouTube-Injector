@@ -3,6 +3,9 @@
   "name": "YouTube Injector",
   "version": "0.1",
   "description": "Injects a video into YouTube pages. by Tim Voronkin",
+  "icons": {
+    "48": "icon/icon48.png"
+  },
   "content_scripts": [
     {
       "matches": ["*://www.youtube.com/"],
