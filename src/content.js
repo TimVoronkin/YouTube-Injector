@@ -23,15 +23,15 @@ function loadApiKey() {
   // Загружаем apiKey.txt как текст, ключ — это весь файл
   return new Promise((resolve, reject) => {
     if (window._yt_api_key_cache) return resolve(window._yt_api_key_cache);
-    fetch(chrome.runtime.getURL('apiKey.txt'))
-      .then(resp => resp.text())
-      .then(text => {
+    fetch(chrome.runtime.getURL("src/apiKey.txt"))
+      .then((resp) => resp.text())
+      .then((text) => {
         const key = text.trim();
         if (key) {
           window._yt_api_key_cache = key;
           resolve(key);
         } else {
-          reject('API key not found in apiKey.txt');
+          reject("API key not found in apiKey.txt");
         }
       })
       .catch(reject);
@@ -41,9 +41,12 @@ function loadApiKey() {
 // Динамически загружаем video_IDs.txt
 async function loadVideoIds() {
   if (window._yt_video_ids_cache) return window._yt_video_ids_cache;
-  const resp = await fetch(chrome.runtime.getURL('video_IDs.txt'));
+  const resp = await fetch(chrome.runtime.getURL("video_IDs.txt"));
   const text = await resp.text();
-  const ids = text.split('\n').map(line => line.trim()).filter(Boolean);
+  const ids = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
   window._yt_video_ids_cache = ids;
   return ids;
 }
@@ -56,43 +59,49 @@ async function getVideoData(videoId) {
   }
   try {
     // Получаем данные о видео
-    const videoResp = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${apiKey}`);
+    const videoResp = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${apiKey}`
+    );
     const videoJson = await videoResp.json();
     if (!videoJson.items || !videoJson.items.length) return null;
     const v = videoJson.items[0];
     // Получаем данные о канале
     const channelId = v.snippet.channelId;
-    const channelResp = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}&key=${apiKey}`);
+    const channelResp = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}&key=${apiKey}`
+    );
     const channelJson = await channelResp.json();
     const c = channelJson.items && channelJson.items[0];
     // Форматируем duration
     function parseDuration(iso) {
       const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-      if (!match) return '';
-      const h = match[1] ? match[1] + ':' : '';
-      const m = match[2] ? (match[1] ? match[2].padStart(2, '0') : match[2]) + ':' : '0:';
-      const s = match[3] ? match[3].padStart(2, '0') : '00';
+      if (!match) return "";
+      const h = match[1] ? match[1] + ":" : "";
+      const m = match[2]
+        ? (match[1] ? match[2].padStart(2, "0") : match[2]) + ":"
+        : "0:";
+      const s = match[3] ? match[3].padStart(2, "0") : "00";
       return h + m + s;
     }
     // Форматируем просмотры
     function formatViews(num) {
-      if (!num) return '';
-      if (num >= 1e9) return (num/1e9).toFixed(1) + 'B views';
-      if (num >= 1e6) return (num/1e6).toFixed(1) + 'M views';
-      if (num >= 1e3) return (num/1e3).toFixed(1) + 'K views';
-      return num + ' views';
+      if (!num) return "";
+      if (num >= 1e9) return (num / 1e9).toFixed(1) + "B views";
+      if (num >= 1e6) return (num / 1e6).toFixed(1) + "M views";
+      if (num >= 1e3) return (num / 1e3).toFixed(1) + "K views";
+      return num + " views";
     }
     // Форматируем дату публикации
     function formatDate(dateStr) {
       const date = new Date(dateStr);
       const now = new Date();
       const diff = (now - date) / 1000;
-      if (diff < 60) return 'just now';
-      if (diff < 3600) return Math.floor(diff/60) + ' min ago';
-      if (diff < 86400) return Math.floor(diff/3600) + ' hours ago';
-      if (diff < 2592000) return Math.floor(diff/86400) + ' days ago';
-      if (diff < 31536000) return Math.floor(diff/2592000) + ' months ago';
-      return Math.floor(diff/31536000) + ' years ago';
+      if (diff < 60) return "just now";
+      if (diff < 3600) return Math.floor(diff / 60) + " min ago";
+      if (diff < 86400) return Math.floor(diff / 3600) + " hours ago";
+      if (diff < 2592000) return Math.floor(diff / 86400) + " days ago";
+      if (diff < 31536000) return Math.floor(diff / 2592000) + " months ago";
+      return Math.floor(diff / 31536000) + " years ago";
     }
     return {
       videoId,
@@ -100,7 +109,7 @@ async function getVideoData(videoId) {
       videoTitle: v.snippet.title,
       channelName: v.snippet.channelTitle,
       channelUrl: `/channel/${channelId}`,
-      channelAvatar: c ? c.snippet.thumbnails.default.url : '',
+      channelAvatar: c ? c.snippet.thumbnails.default.url : "",
       previewUrl: v.snippet.thumbnails.high.url,
       views: formatViews(Number(v.statistics.viewCount)),
       published: formatDate(v.snippet.publishedAt),
@@ -147,15 +156,23 @@ async function injectVideo() {
       <div id="dismissible" class="style-scope ytd-rich-grid-media">
         <div id="thumbnail" class="style-scope ytd-rich-grid-media">
           <ytd-thumbnail rich-grid-thumbnail="" use-hovered-property="" width="9999" class="style-scope ytd-rich-grid-media" size="large" loaded="">
-            <a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" aria-hidden="true" tabindex="-1" rel="null" href="${videoData.videoUrl}">
+            <a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" aria-hidden="true" tabindex="-1" rel="null" href="${
+              videoData.videoUrl
+            }">
               <yt-image alt="" ftl-eligible="" notify-on-loaded="" notify-on-unloaded="" class="style-scope ytd-thumbnail">
-                <img alt="" class="yt-core-image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-aspect-fill yt-core-image--loaded" style="background-color: transparent;" src="${videoData.previewUrl}">
+                <img alt="" class="yt-core-image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-aspect-fill yt-core-image--loaded" style="background-color: transparent;" src="${
+                  videoData.previewUrl
+                }">
               </yt-image>
               <div id="overlays" class="style-scope ytd-thumbnail">
                 <ytd-thumbnail-overlay-time-status-renderer class="style-scope ytd-thumbnail" hide-time-status="" overlay-style="DEFAULT">
                   <div class="thumbnail-overlay-badge-shape style-scope ytd-thumbnail-overlay-time-status-renderer">
-                    <badge-shape class="badge-shape-wiz badge-shape-wiz--thumbnail-default badge-shape-wiz--thumbnail-badge" role="img" aria-label="${videoData.duration}">
-                      <div class="badge-shape-wiz__text">${videoData.duration}</div>
+                    <badge-shape class="badge-shape-wiz badge-shape-wiz--thumbnail-default badge-shape-wiz--thumbnail-badge" role="img" aria-label="${
+                      videoData.duration
+                    }">
+                      <div class="badge-shape-wiz__text">${
+                        videoData.duration
+                      }</div>
                     </badge-shape>
                   </div>
                 </ytd-thumbnail-overlay-time-status-renderer>
@@ -168,9 +185,13 @@ async function injectVideo() {
         <div id="thumbnail-underlay" class="style-scope ytd-rich-grid-media" hidden=""></div>
         <div id="details" class="style-scope ytd-rich-grid-media">
           <div id="avatar-container" class="yt-simple-endpoint style-scope ytd-rich-grid-media">
-            <a id="avatar-link" class="yt-simple-endpoint style-scope ytd-rich-grid-media" tabindex="-1" title="${videoData.channelName}" href="${videoData.channelUrl}">
+            <a id="avatar-link" class="yt-simple-endpoint style-scope ytd-rich-grid-media" tabindex="-1" title="${
+              videoData.channelName
+            }" href="${videoData.channelUrl}">
               <yt-img-shadow id="avatar-image" width="48" class="style-scope ytd-rich-grid-media no-transition" style="background-color: transparent;">
-                <img id="img" draggable="false" class="style-scope yt-img-shadow yt-core-image yt-spec-avatar-shape__image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-to-fill yt-core-image--loaded" alt="" width="48" src="${videoData.channelAvatar}">
+                <img id="img" draggable="false" class="style-scope yt-img-shadow yt-core-image yt-spec-avatar-shape__image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-to-fill yt-core-image--loaded" alt="" width="48" src="${
+                  videoData.channelAvatar
+                }">
               </yt-img-shadow>
             </a>
           </div>
@@ -196,7 +217,9 @@ async function injectVideo() {
                            spellcheck="false"
                            href="${videoData.channelUrl}"
                            style="display: inline-flex; align-items: center; color: inherit; text-decoration: none;">
-                          <span class="style-scope ytd-channel-name">${videoData.channelName}</span>
+                          <span class="style-scope ytd-channel-name">${
+                            videoData.channelName
+                          }</span>
                           ${
                             videoData.verified
                               ? `<span class="badge badge-style-type-verified style-scope ytd-badge-supported-renderer"
@@ -215,8 +238,12 @@ async function injectVideo() {
                   <div id="separator" class="style-scope ytd-video-meta-block">•</div>
                 </div>
                 <div id="metadata-line" class="style-scope ytd-video-meta-block">
-                  <span class="inline-metadata-item style-scope ytd-video-meta-block">${videoData.views}</span>
-                  <span class="inline-metadata-item style-scope ytd-video-meta-block">${videoData.published}</span>
+                  <span class="inline-metadata-item style-scope ytd-video-meta-block">${
+                    videoData.views
+                  }</span>
+                  <span class="inline-metadata-item style-scope ytd-video-meta-block">${
+                    videoData.published
+                  }</span>
                 </div>
               </div>
               <div id="additional-metadata-line" class="style-scope ytd-video-meta-block"></div>
@@ -258,7 +285,7 @@ async function injectVideo() {
   <div class="stroke style-scope yt-interaction"></div>
   <div class="fill style-scope yt-interaction"></div>
 </yt-interaction>
-    `.replaceAll('my-custom-video', 'my-custom-video-' + idx);
+    `.replaceAll("my-custom-video", "my-custom-video-" + idx);
         // Вставляем на случайную позицию от minPos до maxPos (или в конец, если элементов меньше)
         const insertMax = Math.min(maxPos, grid.children.length);
         const insertPos = Math.floor(Math.random() * insertMax) + minPos;

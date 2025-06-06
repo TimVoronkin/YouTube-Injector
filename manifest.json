@@ -9,13 +9,13 @@
   "content_scripts": [
     {
       "matches": ["*://www.youtube.com/"],
-      "js": ["content.js"]
+      "js": ["src/content.js"]
     }
   ],
   "permissions": ["activeTab"],
   "web_accessible_resources": [
     {
-      "resources": ["apiKey.txt", "video_IDs.txt"],
+      "resources": ["src/apiKey.txt", "video_IDs.txt"],
       "matches": ["<all_urls>"]
     }
   ]
