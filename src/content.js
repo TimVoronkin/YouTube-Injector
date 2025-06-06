@@ -18,9 +18,9 @@ const defaultData = {
   verified: true,
 };
 
-// Динамически загружаем apiKey.txt
+// Загружаем YouTube API ключ из файла
+// В этом файле должен быть только ключ, без лишних символов и пробелов
 function loadApiKey() {
-  // Загружаем apiKey.txt как текст, ключ — это весь файл
   return new Promise((resolve, reject) => {
     if (window._yt_api_key_cache) return resolve(window._yt_api_key_cache);
     fetch(chrome.runtime.getURL("src/apiKey.txt"))
@@ -38,7 +38,8 @@ function loadApiKey() {
   });
 }
 
-// Динамически загружаем video_IDs.txt
+// Загружаем список видео которые нужно вставить
+// В этом файле должен быть толкьо список ID видео, по одному на строку
 async function loadVideoIds() {
   if (window._yt_video_ids_cache) return window._yt_video_ids_cache;
   const resp = await fetch(chrome.runtime.getURL("video_IDs.txt"));
@@ -51,6 +52,7 @@ async function loadVideoIds() {
   return ids;
 }
 
+// Получаем данные о видео и канале по ID
 async function getVideoData(videoId) {
   const apiKey = await loadApiKey();
   if (!apiKey) {
@@ -123,7 +125,6 @@ async function getVideoData(videoId) {
 }
 
 async function injectVideo() {
-  // Для главной страницы YouTube
   const grid = document.querySelector("ytd-rich-grid-renderer #contents");
   if (grid) {
     // Получаем videoIds из файла
@@ -135,7 +136,7 @@ async function injectVideo() {
       if (el) el.remove();
     });
 
-    // --- 1. Сначала вставляем плейсхолдеры ---
+    //Сначала вставляем плейсхолдеры
     for (let idx = 0; idx < videoIds.length; idx++) {
       if (!document.getElementById("my-custom-video-" + idx)) {
         const placeholder = document.createElement("ytd-rich-item-renderer");
@@ -159,7 +160,7 @@ async function injectVideo() {
       }
     }
 
-    // --- 2. Затем асинхронно наполняем плейсхолдеры контентом ---
+    //Затем асинхронно наполняем плейсхолдеры контентом
     for (let idx = 0; idx < videoIds.length; idx++) {
       let videoData = defaultData;
       const id = videoIds[idx];
@@ -170,7 +171,6 @@ async function injectVideo() {
       const videoElement = document.createElement("div");
       videoElement.innerHTML = /* html */ `
 
-      
   <div id="content" class="style-scope ytd-rich-item-renderer">
     <ytd-rich-grid-media class="style-scope ytd-rich-item-renderer" lockup="true">
       <div id="dismissible" class="style-scope ytd-rich-grid-media">
@@ -305,7 +305,6 @@ async function injectVideo() {
   <div class="fill style-scope yt-interaction"></div>
 </yt-interaction>
 
-
       `.replaceAll("my-custom-video", "my-custom-video-" + idx);
       // Находим плейсхолдер и заменяем его содержимое
       const placeholder = document.getElementById("my-custom-video-" + idx);
@@ -329,6 +328,7 @@ if (!document.getElementById("my-channel-link-style")) {
   document.head.appendChild(style);
 }
 
+// Ждем появления grid и запускаем injectVideo
 function waitForGridAndInject() {
   const grid = document.querySelector("ytd-rich-grid-renderer #contents");
   if (grid) {
@@ -338,4 +338,5 @@ function waitForGridAndInject() {
   }
 }
 
+// Запускаем проверку сразу
 waitForGridAndInject();
