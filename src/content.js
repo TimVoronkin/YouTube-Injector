@@ -38,15 +38,40 @@ function loadApiKey() {
   });
 }
 
+// Функция для извлечения videoId из произвольной строки
+function parseVideoId(str) {
+  // Если это просто ID (11 символов, буквы/цифры/-, _)
+  // dQw4w9WgXcQ
+  if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
+  // Ищем v=ID в ссылке
+  // https://www.youtube.com/watch?v=dQw4w9WgXcQ
+  const vMatch = str.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+  if (vMatch) return vMatch[1];
+  // Ищем короткую ссылку youtu.be/ID
+  // https://youtu.be/dQw4w9WgXcQ
+  const shortMatch = str.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+  if (shortMatch) return shortMatch[1];
+  // Ищем youtube.com/watch/ID (без v=)
+  // https://www.youtube.com/watch/dQw4w9WgXcQ
+  const watchMatch = str.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/);
+  if (watchMatch) return watchMatch[1];
+  // Ищем youtube.com/embed/ID
+  // https://www.youtube.com/embed/dQw4w9WgXcQ
+  const embedMatch = str.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/);
+  if (embedMatch) return embedMatch[1];
+  // Если ничего не нашли, возвращаем пусто
+  return '';
+}
+
 // Загружаем список видео которые нужно вставить
-// В этом файле должен быть толкьо список ID видео, по одному на строку
+// В этом файле может быть ID или ссылка на видео, по одному на строку
 async function loadVideoIds() {
   if (window._yt_video_ids_cache) return window._yt_video_ids_cache;
   const resp = await fetch(chrome.runtime.getURL("video_IDs.txt"));
   const text = await resp.text();
   const ids = text
     .split("\n")
-    .map((line) => line.trim())
+    .map((line) => parseVideoId(line.trim()))
     .filter(Boolean);
   window._yt_video_ids_cache = ids;
   return ids;
