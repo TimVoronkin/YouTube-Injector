@@ -140,7 +140,8 @@ async function injectVideo() {
       if (!document.getElementById("my-custom-video-" + idx)) {
         const placeholder = document.createElement("ytd-rich-item-renderer");
         placeholder.id = "my-custom-video-" + idx;
-        placeholder.className = "style-scope ytd-rich-grid-renderer my-custom-placeholder";
+        placeholder.className =
+          "style-scope ytd-rich-grid-renderer my-custom-placeholder";
         placeholder.setAttribute("items-per-row", "3");
         placeholder.setAttribute("lockup", "true");
         placeholder.setAttribute("rendered-from-rich-grid", "");
@@ -167,21 +168,31 @@ async function injectVideo() {
         if (fetched) videoData = { ...defaultData, ...fetched };
       }
       const videoElement = document.createElement("div");
-      videoElement.innerHTML = `
+      videoElement.innerHTML = /* html */ `
+
+      
   <div id="content" class="style-scope ytd-rich-item-renderer">
     <ytd-rich-grid-media class="style-scope ytd-rich-item-renderer" lockup="true">
       <div id="dismissible" class="style-scope ytd-rich-grid-media">
         <div id="thumbnail" class="style-scope ytd-rich-grid-media">
           <ytd-thumbnail rich-grid-thumbnail="" use-hovered-property="" width="9999" class="style-scope ytd-rich-grid-media" size="large" loaded="">
-            <a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" aria-hidden="true" tabindex="-1" rel="null" href="${videoData.videoUrl}">
+            <a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" aria-hidden="true" tabindex="-1" rel="null" href="${
+              videoData.videoUrl
+            }">
               <yt-image alt="" ftl-eligible="" notify-on-loaded="" notify-on-unloaded="" class="style-scope ytd-thumbnail">
-                <img alt="" class="yt-core-image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-aspect-fill yt-core-image--loaded" style="background-color: transparent;" src="${videoData.previewUrl}">
+                <img alt="" class="yt-core-image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-aspect-fill yt-core-image--loaded" style="background-color: transparent;" src="${
+                  videoData.previewUrl
+                }">
               </yt-image>
               <div id="overlays" class="style-scope ytd-thumbnail">
                 <ytd-thumbnail-overlay-time-status-renderer class="style-scope ytd-thumbnail" hide-time-status="" overlay-style="DEFAULT">
                   <div class="thumbnail-overlay-badge-shape style-scope ytd-thumbnail-overlay-time-status-renderer">
-                    <badge-shape class="badge-shape-wiz badge-shape-wiz--thumbnail-default badge-shape-wiz--thumbnail-badge" role="img" aria-label="${videoData.duration}">
-                      <div class="badge-shape-wiz__text">${videoData.duration}</div>
+                    <badge-shape class="badge-shape-wiz badge-shape-wiz--thumbnail-default badge-shape-wiz--thumbnail-badge" role="img" aria-label="${
+                      videoData.duration
+                    }">
+                      <div class="badge-shape-wiz__text">${
+                        videoData.duration
+                      }</div>
                     </badge-shape>
                   </div>
                 </ytd-thumbnail-overlay-time-status-renderer>
@@ -194,9 +205,13 @@ async function injectVideo() {
         <div id="thumbnail-underlay" class="style-scope ytd-rich-grid-media" hidden=""></div>
         <div id="details" class="style-scope ytd-rich-grid-media">
           <div id="avatar-container" class="yt-simple-endpoint style-scope ytd-rich-grid-media">
-            <a id="avatar-link" class="yt-simple-endpoint style-scope ytd-rich-grid-media" tabindex="-1" title="${videoData.channelName}" href="${videoData.channelUrl}">
+            <a id="avatar-link" class="yt-simple-endpoint style-scope ytd-rich-grid-media" tabindex="-1" title="${
+              videoData.channelName
+            }" href="${videoData.channelUrl}">
               <yt-img-shadow id="avatar-image" width="48" class="style-scope ytd-rich-grid-media no-transition" style="background-color: transparent;">
-                <img id="img" draggable="false" class="style-scope yt-img-shadow yt-core-image yt-spec-avatar-shape__image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-to-fill yt-core-image--loaded" alt="" width="48" src="${videoData.channelAvatar}">
+                <img id="img" draggable="false" class="style-scope yt-img-shadow yt-core-image yt-spec-avatar-shape__image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-to-fill yt-core-image--loaded" alt="" width="48" src="${
+                  videoData.channelAvatar
+                }">
               </yt-img-shadow>
             </a>
           </div>
@@ -222,14 +237,20 @@ async function injectVideo() {
                            spellcheck="false"
                            href="${videoData.channelUrl}"
                            style="display: inline-flex; align-items: center; color: inherit; text-decoration: none;">
-                          <span class="style-scope ytd-channel-name">${videoData.channelName}</span>
-                          ${videoData.verified ? `<span class="badge badge-style-type-verified style-scope ytd-badge-supported-renderer"
+                          <span class="style-scope ytd-channel-name">${
+                            videoData.channelName
+                          }</span>
+                          ${
+                            videoData.verified
+                              ? `<span class="badge badge-style-type-verified style-scope ytd-badge-supported-renderer"
                                       aria-label="Verified" role="img"
                                       style="display:inline-flex;align-items:center;margin-left:4px;">
                                     <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16" focusable="false" aria-hidden="true" style="pointer-events: none; display: inline-block; width: 16px; height: 16px;">
                                       <path fill="#aaa" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.1L7 11.8l2.8 2.7L17 7.4l1.4 1.4-8.6 8.5z"></path>
                                     </svg>
-                                 </span>` : ""}
+                                 </span>`
+                              : ""
+                          }
                         </a>
                       </div>
                     </div>
@@ -237,8 +258,12 @@ async function injectVideo() {
                   <div id="separator" class="style-scope ytd-video-meta-block">•</div>
                 </div>
                 <div id="metadata-line" class="style-scope ytd-video-meta-block">
-                  <span class="inline-metadata-item style-scope ytd-video-meta-block">${videoData.views}</span>
-                  <span class="inline-metadata-item style-scope ytd-video-meta-block">${videoData.published}</span>
+                  <span class="inline-metadata-item style-scope ytd-video-meta-block">${
+                    videoData.views
+                  }</span>
+                  <span class="inline-metadata-item style-scope ytd-video-meta-block">${
+                    videoData.published
+                  }</span>
                 </div>
               </div>
               <div id="additional-metadata-line" class="style-scope ytd-video-meta-block"></div>
@@ -269,7 +294,6 @@ async function injectVideo() {
       </div>
       <div id="attached-survey" class="style-scope ytd-rich-grid-media"></div>
     </div>
-
     <yt-interaction id="interaction" class="extended style-scope ytd-rich-grid-media">
       <div class="stroke style-scope yt-interaction"></div>
       <div class="fill style-scope yt-interaction"></div>
@@ -280,6 +304,8 @@ async function injectVideo() {
   <div class="stroke style-scope yt-interaction"></div>
   <div class="fill style-scope yt-interaction"></div>
 </yt-interaction>
+
+
       `.replaceAll("my-custom-video", "my-custom-video-" + idx);
       // Находим плейсхолдер и заменяем его содержимое
       const placeholder = document.getElementById("my-custom-video-" + idx);
@@ -292,9 +318,9 @@ async function injectVideo() {
 }
 
 // Добавляем стили для изменения цвета названия канала при наведении
-if (!document.getElementById('my-channel-link-style')) {
-  const style = document.createElement('style');
-  style.id = 'my-channel-link-style';
+if (!document.getElementById("my-channel-link-style")) {
+  const style = document.createElement("style");
+  style.id = "my-channel-link-style";
   style.textContent = `
     a.yt-simple-endpoint.style-scope.ytd-channel-name:hover span.style-scope.ytd-channel-name {
       color: #f1f1f1 !important;
