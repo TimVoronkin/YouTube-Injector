@@ -9,5 +9,11 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["activeTab"]
+  "permissions": ["activeTab"],
+  "web_accessible_resources": [
+    {
+      "resources": ["apiKey.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
